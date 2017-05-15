@@ -3,7 +3,7 @@
 module Brcobranca
   module Remessa
     module Cnab400
-      class Bradesco < Brcobranca::Remessa::Cnab400::Base
+      class Paulista < Brcobranca::Remessa::Cnab400::Base
         # codigo da empresa (informado pelo Bradesco no cadastramento)
         attr_accessor :tipo_registro
         attr_accessor :debito_automatico
@@ -132,33 +132,31 @@ module Brcobranca
         validates_length_of :sequencial                  , maximum: 6,  message: "deve no máximo ter 6 dígitos"
 
 
-        validates_presence_of
-          :tipo_registro,
-          :coobrigacao,
-          :n_controle_participante,
-          :numero_banco,
-          :data_liquidacao,
-          :identificacao_ocorrencia,
-          :n_do_documento,
-          :data_vencimento_titulo,
-          :valor_titulo,
-          :especie_titulo,
-          :data_emissao_titulo,
-          :codigo_de_inscricao_cedente,
-          :numero_termo_cessao,
-          :valor_aquisicao,
-          :codigo_de_inscricao_sacado,
-          :numero_de_inscricao,
-          :nome_sacado,
-          :endereco_completo,
-          :n_nota_fiscal,
-          :cep,
-          :cedente,
-          :nome_Cedente,
-          :numero_de_inscricao_cedente,
-          :chave_nota,
-          :sequencial
-          , message: 'não pode estar em branco.'
+        validates_presence_of :tipo_registro,
+                              :coobrigacao,
+                              :n_controle_participante,
+                              :numero_banco,
+                              :data_liquidacao,
+                              :identificacao_ocorrencia,
+                              :n_do_documento,
+                              :data_vencimento_titulo,
+                              :valor_titulo,
+                              :especie_titulo,
+                              :data_emissao_titulo,
+                              :codigo_de_inscricao_cedente,
+                              :numero_termo_cessao,
+                              :valor_aquisicao,
+                              :codigo_de_inscricao_sacado,
+                              :numero_de_inscricao,
+                              :nome_sacado,
+                              :endereco_completo,
+                              :n_nota_fiscal,
+                              :cep,
+                              :cedente,
+                              :nome_Cedente,
+                              :numero_de_inscricao_cedente,
+                              :chave_nota,
+                              :sequencial, message: 'não pode estar em branco.'
 
         def initialize(campos = {})
           campos = {
