@@ -93,6 +93,77 @@ module Brcobranca
 
       attr_accessor :mensagem_40
 
+      # CNAB 444
+      # <b>REQUERIDO</b>: nome do cedente
+      attr_accessor :nome_cedente
+      # <b>REQUERIDO</b>: documento do cedente
+      attr_accessor :documento_cedente
+
+      attr_accessor :caracteristica_especial
+      attr_accessor :modalidade_operacao
+      # Mod  Descrição
+      # 0301 desconto de duplicatas
+      # 0302 desconto de cheques
+      # 0303 antecipação de fatura de cartão de crédito
+      # 0398 outros direitos creditórios descontados
+      # 0399 outros títulos descontados
+      attr_accessor :natureza_operacao
+      # Domínio Descrição
+      # 02      Operações adquiridas em negociação com pessoa integrante do SFN sem retenção substancial de risco e de benefícios ou de controle pelo interveniente ou cedente
+      # 03      Operações adquiridas em negociação com pessoa não integrante do SFN sem retenção substancial de risco e de benefícios ou de controle pelo interveniente ou cedente
+      # 04      Operações adquiridas em negociação com pessoa integrante do SFN com retenção substancial de risco e de benefícios ou de controle pelo interveniente ou cedente
+      attr_accessor :origem_recurso
+      # Recursos livres
+      # Descrição Mod Descrição
+      # 0101      não liberados
+      # 0102      repasses do exterior
+      # 0199      outros
+      #
+      # Recursos direcionados
+      # Descrição Mod Descrição
+      # 0201      não liberados
+      # 0202      BNDES - Banco Nacional de Desenvolvimento Econômico e Social
+      # 0203      Finame - Agência Especial de Financiamento Industrial
+      # 0204      FCO - Fundo Constitucional do Centro Oeste
+      # 0205      FNE - Fundo Constitucional do Nordeste
+      # 0206      FNO - Fundo Constitucional do Norte
+      # 0207      fundos estaduais ou distritais
+      # 0208      recursos captados em depósitos de poupança pelas entidades integrantes do SBPE destinados a operações de financiamento imobiliário
+      # 0209      financiamentos concedidos ao amparo de recursos controlados do crédito rural
+      # 0210      repasses de organismos multilaterais no exterior
+      # 0211      outros repasses do exterior
+      # 0212      fundos ou programas especiais do governo federal
+      # 0213      FGTS – Fundo de Garantia do Tempo de Serviço
+      # 0299      outros
+      attr_accessor :classe_risco_operacao
+      # Domínio Descrição
+      # AA      Classificação de risco AA
+      # A       Classificação de risco A
+      # B       Classificação de risco B
+      # C       Classificação de risco C
+      # D       Classificação de risco D
+      # E       Classificação de risco E
+      # F       Classificação de risco F
+      # G       Classificação de risco G
+      # H       Classificação de risco H
+      # HH      Classificação de risco HH - créditos baixados como prejuízo
+      attr_accessor :especie_titulo
+      # 01 - Duplicata
+      # 02 - Nota Promissória
+      # 06 - Nota Promissória Física
+      # 12 - Duplicata de Serviço
+      # 14 - Duplicata de Serviço Física
+      # 51 - Cheque
+      # 60 - Contrato
+      # 61 - Contrato Físico
+      # 65 - Fatura de Cartão Credito
+      attr_accessor :numero_termo_cessao
+      attr_accessor :valor_aquisicao
+      attr_accessor :valor_abatimento
+      attr_accessor :n_nota_fiscal
+      attr_accessor :n_serie_nota_fiscal
+      attr_accessor :chave_nota
+
       validates_presence_of :nosso_numero, :data_vencimento, :valor,
                             :documento_sacado, :nome_sacado, :endereco_sacado,
                             :cep_sacado, :cidade_sacado, :uf_sacado, message: 'não pode estar em branco.'
@@ -115,13 +186,23 @@ module Brcobranca
           valor_segundo_desconto: 0.0,
           valor_iof: 0.0,
           valor_abatimento: 0.0,
+          valor_aquisicao: 0.0,
           nome_avalista: '',
           cod_desconto: '0',
           especie_titulo: '01',
           identificacao_ocorrencia: '01',
           codigo_multa: '0',
           percentual_multa: 0.0,
-          parcela: '01'
+          parcela: '01',
+
+
+          # CNAB 444
+          caracteristica_especial: "35", # operações cedidas nos termos da resolução 3.533/08.
+          modalidade_operacao: "0301", # esta dentro de "Direitos creditórios descontados",todas as remessas tem a mesma operação "Direitos creditórios descontados"?
+          natureza_operacao: "02", # Operações adquiridas em negociação com pessoa integrante do SFN sem retenção substancial de risco e de benefícios ou de controle pelo interveniente ou cedente
+          origem_recurso: "0199", # outros
+          classe_risco_operacao: "AA", # Classificação de risco AA
+
         }
 
         campos = padrao.merge!(campos)
@@ -130,6 +211,14 @@ module Brcobranca
         end
 
         yield self if block_given?
+      end
+
+
+      # CNAB 444
+      def formata_endereco_sacado(pgto)
+        endereco = "#{pgto.endereco_sacado}, #{pgto.cidade_sacado}/#{pgto.uf_sacado}"
+        return endereco.ljust(40, ' ') if endereco.size <= 40
+        "#{pgto.endereco_sacado[0..19]} #{pgto.cidade_sacado[0..14]}/#{pgto.uf_sacado}".format_size(40)
       end
 
       # Formata a data de desconto de acordo com o formato passado
@@ -239,12 +328,20 @@ module Brcobranca
         format_value(valor_abatimento, tamanho)
       end
 
+      def formata_valor_aquisicao(tamanho = 13)
+        format_value(valor_aquisicao, tamanho)
+      end
+
       # Retorna a identificacao do pagador
       # Se for pessoa fisica (CPF com 11 digitos) é 1
       # Se for juridica (CNPJ com 14 digitos) é 2
       #
       def identificacao_sacado(zero = true)
         Brcobranca::Util::Empresa.new(documento_sacado, zero).tipo
+      end
+
+      def identificacao_cedente(zero = true)
+        Brcobranca::Util::Empresa.new(documento_cedente, zero).tipo
       end
 
       # Retorna a identificacao do avalista
