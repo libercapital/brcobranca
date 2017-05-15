@@ -160,17 +160,17 @@ module Brcobranca
 
         def initialize(campos = {})
           campos = {
-            tipo_registro = "1",
-            coobrigacao = "01",
-            numero_banco = "000",
-            especie_titulo = "01",
-            codigo_de_inscricao_cedente = "02",
-            codigo_de_inscricao_sacado = "02",
-            caracteristica_especial = "35", # operações cedidas nos termos da resolução 3.533/08.
-            modalidade_operacao = "0301", # esta dentro de "Direitos creditórios descontados",todas as remessas tem a mesma operação "Direitos creditórios descontados"?
-            natureza_operacao = "02", # Operações adquiridas em negociação com pessoa integrante do SFN sem retenção substancial de risco e de benefícios ou de controle pelo interveniente ou cedente
-            origem_recurso = "0199", # outros
-            classe_risco_operacao = "AA", # Classificação de risco AA
+            tipo_registro: "1",
+            coobrigacao: "01",
+            numero_banco: "000",
+            especie_titulo: "01",
+            codigo_de_inscricao_cedente: "02",
+            codigo_de_inscricao_sacado: "02",
+            caracteristica_especial: "35", # operações cedidas nos termos da resolução 3.533/08.
+            modalidade_operacao: "0301", # esta dentro de "Direitos creditórios descontados",todas as remessas tem a mesma operação "Direitos creditórios descontados"?
+            natureza_operacao: "02", # Operações adquiridas em negociação com pessoa integrante do SFN sem retenção substancial de risco e de benefícios ou de controle pelo interveniente ou cedente
+            origem_recurso: "0199", # outros
+            classe_risco_operacao: "AA", # Classificação de risco AA
           }.merge!(campos)
           super(campos)
         end
