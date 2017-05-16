@@ -106,8 +106,8 @@ module Brcobranca
           detalhe << pagamento.nosso_numero.to_s.rjust(11, '0')                         # Não 9(11) Branco
           detalhe << "".ljust(1, " ")                                                   # Não X(01) Branco nosso_numero_dv
           detalhe << "".rjust(10, "0")                                                  # Não 9(10) Valor pago na liquidação/baixa do título (obrigatório na Liquidação)
-          detalhe << "N".ljust(1, "0")                                                  # Não 9(01) Branco n = Banco não emite condicao_emissao
-          detalhe << "".ljust(1, " ")                                                   # Não X(01) Branco
+          detalhe << "1".ljust(1, "0")                                                  # Não X(01) Zeros
+          detalhe << "N".ljust(1, " ")                                                  # Não 9(01) Branco n = Banco não emite condicao_emissao
           detalhe << "".rjust(6, "0")                                                   # Sim 9(06) data_liquidacao DDMMAA (somente para liquidação do título)
           detalhe << "".ljust(4, " ")                                                   # Não X(04) Branco identificacao_operacao
           detalhe << "".ljust(1 , " ")                                                  # Não X(01) Branco indicador_rateio_credito
