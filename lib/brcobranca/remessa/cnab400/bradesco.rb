@@ -19,7 +19,7 @@ module Brcobranca
         # 1 emite aviso,e assume o endereço do Pagadorconstante do Arquivo-Remessa
         # 2 não emite aviso
 
-        attr_accessor :especie_titulo
+        # attr_accessor :especie_titulo
         # 01 Duplicata
         # 02 Nota Promissória
         # 03 Nota de Seguro
@@ -46,7 +46,7 @@ module Brcobranca
         validates_length_of :digito_conta, maximum: 1, message: 'deve ter 1 dígito.'
 
         def initialize(campos = {})
-          campos = { condicao_emissao: '1', aviso_debito: '2', identificacao_registro: 'N', especie_titulo: '99', primeira_instrucao: '00', instrucao_cobranca: '05', campo_multa: '2' }.merge!(campos)
+          campos = { condicao_emissao: '1', aviso_debito: '2', identificacao_registro: 'N', primeira_instrucao: '00', instrucao_cobranca: '05', campo_multa: '2' }.merge!(campos)
           super(campos)
         end
 
@@ -168,7 +168,7 @@ module Brcobranca
           detalhe << pagamento.formata_valor                          # valor do titulo                             9[13]       127 a 139
           detalhe << ''.rjust(3, '0')                                 # banco encarregado (zeros)                   9[03]       140 a 142
           detalhe << ''.rjust(5, '0')                                 # agencia depositaria (zeros)                 9[05]       143 a 147
-          detalhe << especie_titulo                                   # especie do titulo                           9[02]       148 a 149
+          detalhe << pagamento.especie_titulo                         # especie do titulo                           9[02]       148 a 149
           detalhe << 'N'                                              # identificacao (sempre N)                    X[01]       150 a 150
           detalhe << pagamento.data_emissao.strftime('%d%m%y')        # data de emissao                             9[06]       151 a 156
           detalhe << primeira_instrucao.rjust(2, '0')                 # 1a instrucao                                9[02]       157 a 158

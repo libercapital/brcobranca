@@ -41,7 +41,7 @@ module Brcobranca
 
         # Nova instancia do Itau
         def initialize(campos = {})
-          campos = { aceite: 'A', especie_titulo: '99', instrucao_cobranca: '05', primeira_instrucao: '00', segunda_instrucao: '00' }.merge!(campos)
+          campos = { aceite: 'A', instrucao_cobranca: '05', primeira_instrucao: '00', segunda_instrucao: '00' }.merge!(campos)
           super(campos)
         end
 
@@ -157,7 +157,7 @@ module Brcobranca
           detalhe << pagamento.formata_valor                                # valor do documento                    9[13]
           detalhe << cod_banco                                              # codigo banco                          9[03]
           detalhe << ''.rjust(5, '0')                                       # agencia cobradora - deixar zero       9[05]
-          detalhe << especie_titulo                                         # especie  do titulo                    X[02]
+          detalhe << pagamento.especie_titulo                               # especie  do titulo                    X[02]
           detalhe << aceite                                                 # aceite (A/N)                          X[01]
           detalhe << pagamento.data_emissao.strftime('%d%m%y')              # data de emissao                       9[06]
           detalhe << primeira_instrucao.rjust(2, '0')                        # 1a instrucao - deixar zero           X[02]
