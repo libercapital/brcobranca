@@ -94,6 +94,9 @@ module Brcobranca
       attr_accessor :mensagem_40
 
       # CNAB 444
+      # <b>REQUERIDO</b>: coobrigacao
+      # 01 =Com Coobrigação 02 = Sem Coobrigação
+      attr_accessor :coobrigacao
       # <b>REQUERIDO</b>: nome do cedente
       attr_accessor :nome_cedente
       # <b>REQUERIDO</b>: documento do cedente

@@ -93,7 +93,7 @@ module Brcobranca
           raise Brcobranca::RemessaInvalida, pagamento if pagamento.invalid?
           detalhe = tipo_registro.rjust(1, "0")                                         # Sim 9(01) 1
           detalhe << "".ljust(19, " ")                                                  # Não X(19) Branco
-          detalhe << coobrigacao.rjust(2, "0")                                          # SIM 9(02) 01 =Com Coobrigação 02 = Sem Coobrigação
+          detalhe << pagamento.coobrigacao.rjust(2, "0")                                # SIM 9(02) 01 =Com Coobrigação 02 = Sem Coobrigação
           detalhe << pagamento.caracteristica_especial.rjust(2, "0")                    # Não 9(02) Preencher de acordo com o Anexo 8 do layout SRC3040 do Bacen
           detalhe << pagamento.modalidade_operacao.rjust(4, "0")                        # Não 9(04) Preencher de acordo com o Anexo 3 do layout SRC3040 do Bacen – preencher o domínio e o subdomínio
           detalhe << pagamento.natureza_operacao.rjust(2 , "0")                         # Não 9(02) Preencher de acordo com o Anexo 2 do layout SRC3040 do Bacen
