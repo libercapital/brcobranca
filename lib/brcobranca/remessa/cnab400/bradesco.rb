@@ -76,9 +76,9 @@ module Brcobranca
           case Brcobranca::Util::Empresa.new(documento).tipo
           when "01"
             length = pagamento.documento_avalista.length
-            "#{documento[0..length-3]}0000#{documento[length-2..length-0]}"
+            "#{documento[0..length-3]}0000#{documento[length-2..length-0]}".format_size(15)
           when "02"
-            documento.rjust(15, '0')
+            documento.rjust(15, '0').format_size(15)
           end
         end
 
@@ -188,7 +188,7 @@ module Brcobranca
           if pagamento.nome_avalista.present? && pagamento.documento_avalista.present?
             detalhe << monta_documento_avalista(pagamento.documento_avalista)
             detalhe << ''.rjust(2, ' ')
-            detalhe << pagamento.nome_avalista.ljust(43, '0')
+            detalhe << pagamento.nome_avalista.format_size(43).ljust(43, '0')
           else
             detalhe << ''.rjust(60, ' ')                                # 2a mensagem - verificar                     X[60]       335 a 394
           end
