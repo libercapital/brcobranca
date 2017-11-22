@@ -5,15 +5,13 @@ module Brcobranca
     module Cnab444
       class Paulista < Brcobranca::Remessa::Cnab444::Base
         # codigo da empresa (informado pelo Bradesco no cadastramento)
-        attr_accessor :codigo_empresa
         attr_accessor :tipo_registro
         attr_accessor :coobrigacao
         attr_accessor :identificacao_ocorrencia
         attr_accessor :primeira_instrucao
         attr_accessor :segunda_instrucao
 
-        validates_presence_of :codigo_empresa,
-                              :tipo_registro,
+        validates_presence_of :tipo_registro,
                               :coobrigacao,
                               :primeira_instrucao,
                               :segunda_instrucao, message: 'não pode estar em branco.'
@@ -55,16 +53,8 @@ module Brcobranca
           @conta_corrente = valor.to_s.rjust(7, '0') if valor
         end
 
-        def codigo_empresa=(valor)
-          @codigo_empresa = valor.to_s.rjust(20, '0') if valor
-        end
-
         def sequencial_remessa=(valor)
           @sequencial_remessa = valor.to_s.rjust(7, '0') if valor
-        end
-
-        def info_conta
-          codigo_empresa
         end
 
         def cod_banco
