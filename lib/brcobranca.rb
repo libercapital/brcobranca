@@ -160,10 +160,11 @@ module Brcobranca
     end
 
     module Cnab240
-      autoload :Base,         'brcobranca/remessa/cnab240/base'
-      autoload :Caixa,        'brcobranca/remessa/cnab240/caixa'
-      autoload :BancoBrasil,  'brcobranca/remessa/cnab240/banco_brasil'
-      autoload :Sicoob,       'brcobranca/remessa/cnab240/sicoob'
+      autoload :Base,                'brcobranca/remessa/cnab240/base'
+      autoload :Caixa,               'brcobranca/remessa/cnab240/caixa'
+      autoload :BancoBrasil,         'brcobranca/remessa/cnab240/banco_brasil'
+      autoload :Sicoob,              'brcobranca/remessa/cnab240/sicoob'
+      autoload :BancoRibeiraoPreto,  'brcobranca/remessa/cnab240/banco_ribeirao_preto'
     end
 
     module Cnab444

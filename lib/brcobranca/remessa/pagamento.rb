@@ -93,6 +93,9 @@ module Brcobranca
 
       attr_accessor :mensagem_40
 
+      # CNAB 240
+      attr_accessor :mensagem_200
+
       # CNAB 444
       # <b>REQUERIDO</b>: coobrigacao
       # 01 =Com Coobrigação 02 = Sem Coobrigação
@@ -197,7 +200,6 @@ module Brcobranca
           codigo_multa: '0',
           percentual_multa: 0.0,
           parcela: '01',
-
 
           # CNAB 444
           caracteristica_especial: "35", # operações cedidas nos termos da resolução 3.533/08.
