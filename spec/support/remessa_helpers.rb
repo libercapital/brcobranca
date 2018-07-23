@@ -1,8 +1,8 @@
 
 #
 module RemessaHelpers
-  def read_remessa(name, body = nil)
-    filename = File.join(File.dirname(__FILE__), '..', 'fixtures', 'remessa', name)
+  def read_remessa(name, body = nil, host = 'remessa')
+    filename = File.join(File.dirname(__FILE__), '..', 'fixtures', host, name)
     File.open(filename, 'w') { |f| f.write(body) } unless File.exist?(filename)
     File.read(filename)
   end

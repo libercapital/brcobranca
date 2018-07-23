@@ -177,4 +177,16 @@ module Brcobranca
   module Util
     autoload :Empresa, 'brcobranca/util/empresa'
   end
+
+  module Brpagamento
+    module Remessa
+      autoload :Base,         'brcobranca/brpagamento/remessa/base'
+      autoload :Pagamento,    'brcobranca/brpagamento/remessa/pagamento'
+
+      module Cnab240
+        autoload :Base,       'brcobranca/brpagamento/remessa/cnab240/base'
+        autoload :Itau,       'brcobranca/brpagamento/remessa/cnab240/itau'
+      end
+    end
+  end
 end
