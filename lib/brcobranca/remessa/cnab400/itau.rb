@@ -6,6 +6,25 @@ module Brcobranca
         VALOR_EM_REAIS = "1"
         VALOR_EM_PERCENTUAL = "2"
 
+        attr_accessor :aceite
+        # 'A' – para sim, ou 'N' – para não
+
+        attr_accessor :especie_titulo
+        # 01 DUPLICATA MERCANTIL
+        # 02 NOTA PROMISSÓRIA
+        # 03 NOTA DE SEGURO
+        # 04 MENSALIDADE ESCOLAR
+        # 05 RECIBO
+        # 06 CONTRATO
+        # 07 COSSEGUROS
+        # 08 DUPLICATA DE SERVIÇO
+        # 09 LETRA DE CÂMBIO
+        # 13 NOTA DE DÉBITOS
+        # 15 DOCUMENTO DE DÍVIDA
+        # 16 ENCARGOS CONDOMINIAIS
+        # 17 CONTA DE PRESTAÇÃO DE SERVIÇOS
+        # 99 DIVERSOS
+
         validates_presence_of :agencia, :conta_corrente, message: 'não pode estar em branco.'
         validates_presence_of :documento_cedente, :digito_conta, message: 'não pode estar em branco.'
         validates_length_of :agencia, maximum: 4, message: 'deve ter 4 dígitos.'
@@ -16,8 +35,32 @@ module Brcobranca
 
         # Nova instancia do Itau
         def initialize(campos = {})
-          campos = { aceite: 'N' }.merge!(campos)
+          campos = { aceite: 'A' }.merge!(campos)
           super(campos)
+        end
+
+        def gera_arquivo
+          raise Brcobranca::RemessaInvalida, self unless valid?
+
+          # contador de registros no arquivo
+          contador = 1
+          ret = [monta_header]
+          pagamentos.each do |pagamento|
+            contador += 1
+            ret << monta_detalhe(pagamento, contador)
+            contador += 1
+            ret << monta_detalhe_multa(pagamento, contador)
+            if pagamento.tipo_empresa == "03" || pagamento.tipo_empresa == "04"
+              contador += 1
+              ret << monta_detalhe_avalista(pagamento, contador)
+            end
+          end
+          ret << monta_trailer(contador + 1)
+
+          remittance = ret.join("\n").to_ascii.upcase
+          remittance << "\n"
+
+          remittance.encode(remittance.encoding, universal_newline: true).encode(remittance.encoding, crlf_newline: true)
         end
 
         def agencia=(valor)
@@ -87,10 +130,9 @@ module Brcobranca
         #
         def monta_detalhe(pagamento, sequencial)
           raise Brcobranca::RemessaInvalida, pagamento if pagamento.invalid?
-
           detalhe = '1'                                                     # identificacao transacao               9[01]
-          detalhe << Brcobranca::Util::Empresa.new(documento_cedente).tipo  # tipo de identificacao da empresa      9[02]
-          detalhe << documento_cedente.to_s.rjust(14, '0')                  # cpf/cnpj da empresa                   9[14]
+          detalhe << pagamento.tipo_empresa                                 # tipo de identificacao da empresa      9[02]
+          detalhe << pagamento.documento_empresa.to_s.rjust(14, '0')        # cpf/cnpj da empresa                   9[14]
           detalhe << agencia                                                # agencia                               9[04]
           detalhe << ''.rjust(2, '0')                                       # complemento de registro (zeros)       9[02]
           detalhe << conta_corrente                                         # conta corrente                        9[05]
@@ -109,7 +151,7 @@ module Brcobranca
           detalhe << pagamento.formata_valor                                # valor do documento                    9[13]
           detalhe << cod_banco                                              # codigo banco                          9[03]
           detalhe << ''.rjust(5, '0')                                       # agencia cobradora - deixar zero       9[05]
-          detalhe << '99'                                                   # especie  do titulo                    X[02]
+          detalhe << pagamento.especie_titulo                               # especie  do titulo                    X[02]
           detalhe << aceite                                                 # aceite (A/N)                          X[01]
           detalhe << pagamento.data_emissao.strftime('%d%m%y')              # data de emissao                       9[06]
           detalhe << pagamento.cod_primeira_instrucao                       # 1a instrucao - deixar zero            X[02]
@@ -128,10 +170,14 @@ module Brcobranca
           detalhe << pagamento.cep_sacado                                   # cep do pagador                        9[08]
           detalhe << pagamento.cidade_sacado.format_size(15)                # cidade do pagador                     X[15]
           detalhe << pagamento.uf_sacado                                    # uf do pagador                         X[02]
-          detalhe << pagamento.nome_avalista.format_size(30)                # nome do sacador/avalista              X[30]
-          detalhe << ''.rjust(4, ' ')                                       # complemento do registro               X[04]
-          detalhe << ''.rjust(6, '0')                                       # data da mora                          9[06] *
-          detalhe << prazo_instrucao(pagamento)                             # prazo para a instrução          9[02]
+          if pagamento.tipo_empresa == "03" || pagamento.tipo_empresa == "04"
+            detalhe << pagamento.nome_avalista.format_size(30)                # nome do sacador/avalista              X[30]
+            detalhe << ''.rjust(4, ' ')                                       # complemento do registro               X[04]
+            detalhe << pagamento.formata_data_multa.rjust(6, '0')             # data da mora                          9[06] *
+          else
+            detalhe << pagamento.mensagem_40.format_size(40)                # mensagem 40                           X[40]
+          end
+          detalhe << prazo_instrucao(pagamento)                             # quantidade de dias do prazo           9[02] *
           detalhe << ''.rjust(1, ' ')                                       # complemento do registro (brancos)     X[01]
           detalhe << sequencial.to_s.rjust(6, '0')                          # numero do registro no arquivo         9[06]
           detalhe
@@ -145,10 +191,26 @@ module Brcobranca
         def monta_detalhe_multa(pagamento, sequencial)
           detalhe = '2'
           detalhe << pagamento.codigo_multa
-          detalhe << pagamento.data_vencimento.strftime('%d%m%Y')
+          detalhe << pagamento.formata_data_multa('%d%m%Y')
           detalhe << pagamento.formata_percentual_multa(13)
           detalhe << ''.rjust(371, ' ')
           detalhe << sequencial.to_s.rjust(6, '0')
+          detalhe
+        end
+
+        def monta_detalhe_avalista(pagamento, sequencial)
+          raise Brcobranca::RemessaInvalida, pagamento if pagamento.invalid?
+          detalhe = '5'                                                                # TIPO DE REGISTRO001          001 - 001 9[001]
+          detalhe << ' '.rjust(120, ' ')                                               # BRANCOS                      002 - 121 X[120]
+          detalhe << Brcobranca::Util::Empresa.new(pagamento.documento_avalista).tipo  # tipo de  da empresa          122 - 123 9[002]
+          detalhe << pagamento.documento_avalista.format_size(14).rjust(14, ' ')       #                              124 - 137 9[014]
+          detalhe << pagamento.endereco_avalista.format_size(40).rjust(40, ' ')        #                              138 - 177 9[040]
+          detalhe << pagamento.bairro_avalista.format_size(12).rjust(12, ' ')          #                              178 - 189 9[012]
+          detalhe << pagamento.cep_avalista.format_size(8).rjust(8, ' ')               #                              190 - 197 9[008]
+          detalhe << pagamento.cidade_avalista.format_size(15).rjust(15, ' ')          #                              198 - 212 9[015]
+          detalhe << pagamento.uf_avalista.format_size(2).rjust(2, ' ')                #                              213 - 214 9[002]
+          detalhe << ' '.rjust(180, ' ')                                               # BRANCOS                      215 - 394 9[180]
+          detalhe << sequencial.to_s.rjust(6, '0')                                     # numero do registro   arquivo 395 - 400 9[006]
           detalhe
         end
       end

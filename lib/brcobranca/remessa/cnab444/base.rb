@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
+#
 module Brcobranca
   module Remessa
-    module Cnab400
+    module Cnab444
       class Base < Brcobranca::Remessa::Base
-        validates_presence_of :carteira, message: 'não pode estar em branco.'
 
         # Data da geracao do arquivo seguindo o padrao DDMMAA
         #
@@ -46,7 +46,7 @@ module Brcobranca
           # identificacao registro  [1]      9
           # complemento             [393]
           # num. sequencial         [6]
-          "9#{''.rjust(393, ' ')}#{sequencial.to_s.rjust(6, '0')}"
+          "9#{''.rjust(437, ' ')}#{sequencial.to_s.rjust(6, '0')}"
         end
 
         # Registro detalhe do arquivo remessa
@@ -69,10 +69,6 @@ module Brcobranca
           pagamentos.each do |pagamento|
             contador += 1
             ret << monta_detalhe(pagamento, contador)
-            if pagamento.codigo_multa.to_i > 0 && self.respond_to?(:monta_detalhe_multa)
-              contador += 1
-              ret << monta_detalhe_multa(pagamento, contador)
-            end
           end
           ret << monta_trailer(contador + 1)
 

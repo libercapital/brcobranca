@@ -10,9 +10,13 @@ module Brcobranca
 
         attr_accessor :codigo_carteira
 
+        attr_accessor :aceite
+        # 'A' – para sim, ou 'N' – para não
+
         validates_presence_of :documento_cedente, :codigo_transmissao, message: 'não pode estar em branco.'
         validates_presence_of :digito_conta, message: 'não pode estar em branco.', if: :conta_padrao_novo?
-        validates_length_of :documento_cedente, minimum: 11, maximum: 14, message: 'deve ter entre 11 e 14 dígitos.'
+        validates_presence_of :agencia, :conta_corrente, :digito_conta, message: 'não pode estar em branco.'
+
         validates_length_of :carteira, maximum: 3, message: 'deve ter no máximo 3 dígitos.'
         validates_length_of :codigo_transmissao, maximum: 20, message: 'deve ter no máximo 20 dígitos.'
 

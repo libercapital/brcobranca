@@ -182,6 +182,12 @@ module Brcobranca
       autoload :SicoobBancoBrasil,  'brcobranca/remessa/cnab240/sicoob_banco_brasil'
       autoload :Sicredi,            'brcobranca/remessa/cnab240/sicredi'
       autoload :Unicred,            'brcobranca/remessa/cnab240/unicred'
+      autoload :BancoRibeiraoPreto,  'brcobranca/remessa/cnab240/banco_ribeirao_preto'
+    end
+
+    module Cnab444
+      autoload :Base,         'brcobranca/remessa/cnab444/base'
+      autoload :Paulista,     'brcobranca/remessa/cnab444/paulista'
     end
   end
 
@@ -189,5 +195,17 @@ module Brcobranca
   module Util
     autoload :Empresa, 'brcobranca/util/empresa'
     autoload :Errors, 'brcobranca/util/errors'
+  end
+
+  module Brpagamento
+    module Remessa
+      autoload :Base,         'brcobranca/brpagamento/remessa/base'
+      autoload :Pagamento,    'brcobranca/brpagamento/remessa/pagamento'
+
+      module Cnab240
+        autoload :Base,       'brcobranca/brpagamento/remessa/cnab240/base'
+        autoload :Itau,       'brcobranca/brpagamento/remessa/cnab240/itau'
+      end
+    end
   end
 end

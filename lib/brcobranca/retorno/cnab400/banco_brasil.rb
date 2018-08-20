@@ -30,7 +30,7 @@ module Brcobranca
           parse.field :cedente_com_dv, 22..30
 
           # :convenio, 31..37 #convenio da empresa
-          # :uso_da_empresa, 38..62 #identificacao do titulo na empresa
+          # :documento, 38..62 #identificacao do titulo na empresa
 
           # :nosso_numero,63..79 # identificacao do titulo no banco
           parse.field :nosso_numero, 63..79
