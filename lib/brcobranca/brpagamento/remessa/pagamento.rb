@@ -47,9 +47,9 @@ module Brcobranca
         #
         def initialize(campos = {})
           padrao = {
-            tipo_moeda: '09',
+            tipo_moeda: '009',
             tipo_movimento: '000',
-            aviso_favorecido: '00',
+            aviso_favorecido: '0',
             finalidade_ted: '00010'
           }
 
@@ -105,31 +105,37 @@ module Brcobranca
           finalidade_ted.rjust(5, '0')
         end
 
-        # ------------------------------ #
-        # Forma No Agend. Após Pagamento #
-        # ------------------------------ #
-        # 00    NÃO       NÃO            #
-        # ------------------------------ #
-        # 01    SIM       SIM            #
-        # ------------------------------ #
-        # 02    SIM       SIM            #
-        # ------------------------------ #
-        # 03    SIM       SIM            #
-        # ------------------------------ #
-        # 05    SIM       NÃO            #
-        # ------------------------------ #
-        # 06    SIM       NÃO            #
-        # ------------------------------ #
-        # 07    SIM       NÃO            #
-        # ------------------------------ #
-        # 10    SIM       NÃO            #
-        # ------------------------------ #
-        # 41    SIM       SIM            #
-        # ------------------------------ #
-        # 43    SIM       SIM            #
-        # ------------------------------ #
+        # Se igual a ‘0’ não emite aviso ao favorecido;
+        # Se igual a ‘3’ emite aviso ao favorecido quando do agendamento do pagamento, sendo obrigatória a existência de um registro com segmento B.
+        # Se igual a ‘5’ e mite aviso ao favorecido após pagamento efetuado, sendo obrigatória a existência de um registro com segmento B.
+        # Se igual a ‘9’ emite aviso ao favorecido tanto no agendamento quanto após o pagamento, sendo obrigatória a existência de um registro com segmento B.
+        #
+        # Observação: Apenas serão emitidos avisos para os tipos de pagamentos 20 (fornecedores) ou 98 (diversos) e para as formas abaixo, conforme segue:
+        # --------------------------------------- #
+        # Forma (nota 5) No Agend. Após Pagamento #
+        # --------------------------------------- #
+        # 00             NÃO       NÃO            #
+        # --------------------------------------- #
+        # 01             SIM       SIM            #
+        # --------------------------------------- #
+        # 02             SIM       SIM            #
+        # --------------------------------------- #
+        # 03             SIM       SIM            #
+        # --------------------------------------- #
+        # 05             SIM       NÃO            #
+        # --------------------------------------- #
+        # 06             SIM       NÃO            #
+        # --------------------------------------- #
+        # 07             SIM       NÃO            #
+        # --------------------------------------- #
+        # 10             SIM       NÃO            #
+        # --------------------------------------- #
+        # 41             SIM       SIM            #
+        # --------------------------------------- #
+        # 43             SIM       SIM            #
+        # --------------------------------------- #
         def aviso_ao_favorecido
-          aviso_favorecido.rjust(2, '0')
+          aviso_favorecido.rjust(1, '0')
         end
 
         # Tipo de movimento
@@ -176,17 +182,17 @@ module Brcobranca
 
         def conta_bancaria_favorecido
           conta = ''                                           # Descrição                         Posição  Tamanho
-          if
+          if cod_banco == ('341' || '409')
             conta << agencia.rjust(5, '0')                     # AGÊNCIA NÚMERO FAVORECIDO         [24..28] 05(9)
             conta << ''.ljust(1, ' ')                          # BRANCOS                           [29..29] 01(X)
             conta << conta_corrente.rjust(12, '0')             # CONTA NÚMERO FAVORECIDO           [30..41] 12(9)
-            conta << ''.ljust(1, ' ')                          # BRANCOS                           [42..42] X(01)
-            conta << ''.ljust(1, ' ')                          # DAC DA AGÊNCIA/CONTA FAVORECIDO   [43..43] 01(X)
+            conta << ''.ljust(1, ' ')                          # BRANCOS                           [42..42] 01(X)
+            conta << digito_conta                              # DAC DA AGÊNCIA/CONTA FAVORECIDO   [43..43] 01(X)
           else
             conta << ''.rjust(1, '0')                          # ZEROS                             [24..24] 01(9)
             conta << agencia.rjust(4, '0')                     # AGÊNCIA NÚMERO FAVORECIDO         [25..28] 04(9)
             conta << ''.ljust(1, ' ')                          # BRANCOS                           [29..29] 01(X)
-            conta << ''.ljust(6, ' ')                          # ZEROS                             [30..35] 06(9)
+            conta << ''.rjust(6, '0')                          # ZEROS                             [30..35] 06(9)
             conta << conta_corrente.rjust(6, '0')              # CONTA NÚMERO FAVORECIDO           [36..41] 06(9)
             conta << ''.ljust(1, ' ')                          # BRANCOS                           [42..42] 01(X)
             conta << digito_conta                              # DAC DA AGÊNCIA/CONTA FAVORECIDO   [43..43] 01(9)

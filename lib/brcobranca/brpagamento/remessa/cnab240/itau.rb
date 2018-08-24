@@ -165,7 +165,7 @@ module Brcobranca
             header_arquivo << ''.rjust(20, ' ')                                              # BRANCOS                                [33....52] 20(X)
             header_arquivo << agencia.rjust(5, '0')                                          # NÚMERO AGÊNCIA DEBITADA                [53....57] 05(9)
             header_arquivo << ''.rjust(1, ' ')                                               # BRANCOS                                [58....58] 01(X)
-            header_arquivo << conta_corrente.ljust(12, ' ')                                  # CONTA NÚMERO DEBITADA                  [59....70] 12(9)
+            header_arquivo << conta_corrente.rjust(12, '0')                                  # CONTA NÚMERO DEBITADA                  [59....70] 12(9)
             header_arquivo << ''.rjust(1, ' ')                                               # BRANCOS                                [71....71] 01(X)
             header_arquivo << digito_conta                                                   # DAC DA AGÊNCIA/CONTA DEBITADA          [72....72] 01(9)
             header_arquivo << empresa_mae.format_size(30)                                    # NOME DA EMPRESA                        [73...102] 30(X)
@@ -175,7 +175,7 @@ module Brcobranca
             header_arquivo << data_geracao                                                   # DATA DE GERAÇÃO DO ARQUIVO             [144..151] 08(9) DDMMAAAA
             header_arquivo << hora_geracao                                                   # HORA DE GERAÇÃO DO ARQUIVO             [152..157] 06(9) HHMMSS
             header_arquivo << ''.rjust(9, '0')                                               # ZEROS                                  [158..166] 09(9)
-            header_arquivo << densidade_gravacao.rjust(9, '0')                               # DENSIDADE DE GRAVAÇÃO DO ARQUIVO       [167..171] 05(9) 0 Padrao | 1600 BPI | # 6250 BPI
+            header_arquivo << densidade_gravacao.rjust(5, '0')                               # DENSIDADE DE GRAVAÇÃO DO ARQUIVO       [167..171] 05(9) 0 Padrao | 1600 BPI | # 6250 BPI
             header_arquivo << ''.rjust(69, ' ')                                              # BRANCOS                                [172..240] 69(X)
             header_arquivo
           end
@@ -203,7 +203,7 @@ module Brcobranca
             header_lote << ''.rjust(16, ' ')                                                 # BRANCOS                                               [37....52] 16(X)
             header_lote << agencia.rjust(5, '0')                                             # AGÊNCIA NÚMERO DEBITADA                               [53....57] 05(9) NOTA 1
             header_lote << ''.rjust(1, ' ')                                                  # BRANCOS                                               [58....58] 01(X)
-            header_lote << conta_corrente.ljust(12, ' ')                                     # CONTA NÚMERO DEBITADA                                 [59....70] 12(9) NOTA 1
+            header_lote << conta_corrente.rjust(12, '0')                                     # CONTA NÚMERO DEBITADA                                 [59....70] 12(9) NOTA 1
             header_lote << ''.rjust(1, ' ')                                                  # BRANCOS                                               [71....71] 01(X)
             header_lote << digito_conta                                                      # DAC DA AGÊNCIA/CONTA DEBITADA                         [72....72] 01(9) NOTA 1
             header_lote << empresa_mae.format_size(30)                                       # NOME DA EMPRESA DEBITADA                              [73...102] 30(X)
@@ -230,7 +230,7 @@ module Brcobranca
             segmento_a = ''                                                                  # Descrição                             Posição    Tamanho
             segmento_a << cod_banco                                                          # CÓDIGO DO BANCO                       [1......3] 03(9) 341
             segmento_a << counter_lotes(nro_lote)                                            # CÓDIGO DO LOTE                        [4......7] 04(9) NOTA 3
-            segmento_a << '1'                                                                # TIPO DE REGISTRO                      [8......8] 01(9) 3
+            segmento_a << '3'                                                                # TIPO DE REGISTRO                      [8......8] 01(9) 3
             segmento_a << sequencial.to_s.rjust(5, '0')                                      # SEQUENCIAL REGISTRO NO LOTE           [9.....13] 05(9) NOTA 9
             segmento_a << 'A'                                                                # SEGMENTO CÓDIGO                       [14....14] 01(X) A
             segmento_a << pagamento.tipo_de_movimento                                        # TIPO DE MOVIMENTO                     [15....17] 03(9) NOTA 10
@@ -347,7 +347,7 @@ module Brcobranca
             contador = 1
             arquivo.push monta_lote(contador)
 
-            arquivo << monta_trailer_arquivo(contador, ((pagamentos.size * 2) + (contador * 2) + 2))
+            arquivo << monta_trailer_arquivo(contador, ((pagamentos.size) + (contador * 2) + 2))
 
             remittance = arquivo.join("\r\n").to_ascii.upcase
             remittance << "\r\n"
