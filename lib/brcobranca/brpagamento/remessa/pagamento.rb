@@ -47,9 +47,9 @@ module Brcobranca
         #
         def initialize(campos = {})
           padrao = {
-            tipo_moeda: '09',
+            tipo_moeda: '009',
             tipo_movimento: '000',
-            aviso_favorecido: '00',
+            aviso_favorecido: '0',
             finalidade_ted: '00010'
           }
 
@@ -105,31 +105,37 @@ module Brcobranca
           finalidade_ted.rjust(5, '0')
         end
 
-        # ------------------------------ #
-        # Forma No Agend. Após Pagamento #
-        # ------------------------------ #
-        # 00    NÃO       NÃO            #
-        # ------------------------------ #
-        # 01    SIM       SIM            #
-        # ------------------------------ #
-        # 02    SIM       SIM            #
-        # ------------------------------ #
-        # 03    SIM       SIM            #
-        # ------------------------------ #
-        # 05    SIM       NÃO            #
-        # ------------------------------ #
-        # 06    SIM       NÃO            #
-        # ------------------------------ #
-        # 07    SIM       NÃO            #
-        # ------------------------------ #
-        # 10    SIM       NÃO            #
-        # ------------------------------ #
-        # 41    SIM       SIM            #
-        # ------------------------------ #
-        # 43    SIM       SIM            #
-        # ------------------------------ #
+        # Se igual a ‘0’ não emite aviso ao favorecido;
+        # Se igual a ‘3’ emite aviso ao favorecido quando do agendamento do pagamento, sendo obrigatória a existência de um registro com segmento B.
+        # Se igual a ‘5’ e mite aviso ao favorecido após pagamento efetuado, sendo obrigatória a existência de um registro com segmento B.
+        # Se igual a ‘9’ emite aviso ao favorecido tanto no agendamento quanto após o pagamento, sendo obrigatória a existência de um registro com segmento B.
+        #
+        # Observação: Apenas serão emitidos avisos para os tipos de pagamentos 20 (fornecedores) ou 98 (diversos) e para as formas abaixo, conforme segue:
+        # --------------------------------------- #
+        # Forma (nota 5) No Agend. Após Pagamento #
+        # --------------------------------------- #
+        # 00             NÃO       NÃO            #
+        # --------------------------------------- #
+        # 01             SIM       SIM            #
+        # --------------------------------------- #
+        # 02             SIM       SIM            #
+        # --------------------------------------- #
+        # 03             SIM       SIM            #
+        # --------------------------------------- #
+        # 05             SIM       NÃO            #
+        # --------------------------------------- #
+        # 06             SIM       NÃO            #
+        # --------------------------------------- #
+        # 07             SIM       NÃO            #
+        # --------------------------------------- #
+        # 10             SIM       NÃO            #
+        # --------------------------------------- #
+        # 41             SIM       SIM            #
+        # --------------------------------------- #
+        # 43             SIM       SIM            #
+        # --------------------------------------- #
         def aviso_ao_favorecido
-          aviso_favorecido.rjust(2, '0')
+          aviso_favorecido.rjust(1, '0')
         end
 
         # Tipo de movimento

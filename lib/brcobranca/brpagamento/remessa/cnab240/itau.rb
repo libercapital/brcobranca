@@ -175,7 +175,7 @@ module Brcobranca
             header_arquivo << data_geracao                                                   # DATA DE GERAÇÃO DO ARQUIVO             [144..151] 08(9) DDMMAAAA
             header_arquivo << hora_geracao                                                   # HORA DE GERAÇÃO DO ARQUIVO             [152..157] 06(9) HHMMSS
             header_arquivo << ''.rjust(9, '0')                                               # ZEROS                                  [158..166] 09(9)
-            header_arquivo << densidade_gravacao.rjust(9, '0')                               # DENSIDADE DE GRAVAÇÃO DO ARQUIVO       [167..171] 05(9) 0 Padrao | 1600 BPI | # 6250 BPI
+            header_arquivo << densidade_gravacao.rjust(5, '0')                               # DENSIDADE DE GRAVAÇÃO DO ARQUIVO       [167..171] 05(9) 0 Padrao | 1600 BPI | # 6250 BPI
             header_arquivo << ''.rjust(69, ' ')                                              # BRANCOS                                [172..240] 69(X)
             header_arquivo
           end
