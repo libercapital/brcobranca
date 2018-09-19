@@ -293,7 +293,7 @@ module Brcobranca
           segmento_s << ' '                                                                # Uso Exclusivo FEBRABAN/CNAB       [15...015] 01
           segmento_s << '01'                                                               # Código de Movimento Remessa       [16...017] 02
           segmento_s << '3'                                                                # Identificação da Impressão        [18...018] 01 | 3' = Corpo de Instruções da Ficha de Compensação do Bloqueto
-          segmento_s << pagamento.mensagem_200.format_size(200)                            # Mensagem 5                        [19...058] 40
+          segmento_s << pagamento.mensagem.format_size(200)                            # Mensagem 5                        [19...058] 40
           segmento_s << ''                                                                 # Mensagem 6                        [59...098] 40
           segmento_s << ''                                                                 # Mensagem 7                        [990..138] 40
           segmento_s << ''                                                                 # Mensagem 8                        [139..178] 40

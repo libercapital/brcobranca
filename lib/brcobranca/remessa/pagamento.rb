@@ -91,10 +91,7 @@ module Brcobranca
       # (baixa, liquidação, confirmação de protesto, etc.) com o mesmo conteúdo da entrada.
       attr_accessor :uso_da_empresa
 
-      attr_accessor :mensagem_40
-
-      # CNAB 240
-      attr_accessor :mensagem_200
+      attr_accessor :mensagem
 
       # CNAB 444
       # <b>REQUERIDO</b>: coobrigacao

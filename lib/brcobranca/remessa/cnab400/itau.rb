@@ -181,7 +181,7 @@ module Brcobranca
             detalhe << ''.rjust(4, ' ')                                       # complemento do registro               X[04]
             detalhe << pagamento.formata_data_multa.rjust(6, '0')             # data da mora                          9[06] *
           else
-            detalhe << pagamento.mensagem_40.format_size(40)                # mensagem 40                           X[40]
+            detalhe << pagamento.mensagem.format_size(40)                   # mensagem 40                           X[40]
           end
           detalhe << instrucao_cobranca.rjust(2, '0')                       # quantidade de dias do prazo           9[02] *
           detalhe << ''.rjust(1, ' ')                                       # complemento do registro (brancos)     X[01]

@@ -190,7 +190,7 @@ module Brcobranca
             detalhe << ''.rjust(2, ' ')
             detalhe << pagamento.nome_avalista.format_size(43).ljust(43, '0')
           else
-            detalhe << ''.rjust(60, ' ')                                # 2a mensagem - verificar                     X[60]       335 a 394
+            detalhe << pagamento.mensagem.format_size(60)             # 2a mensagem - verificar                     X[60]       335 a 394
           end
           detalhe << sequencial.to_s.rjust(6, '0')                    # numero do registro do arquivo               9[06]       395 a 400
           detalhe
