@@ -16,13 +16,16 @@ module Brcobranca
         attr_accessor :identificador_complemento
         # INFORMAR NESTE CAMPO CARACTERE 'I' (i maiúsculo)
 
+        attr_accessor :primeira_instrucao
+        attr_accessor :segunda_instrucao
+
         validates_presence_of :documento_cedente, :codigo_transmissao, :agencia, :conta_corrente, :digito_conta, message: 'não pode estar em branco.'
         validates_length_of :documento_cedente, minimum: 11, maximum: 14, message: 'deve ter entre 11 e 14 dígitos.'
         validates_length_of :carteira, maximum: 3, message: 'deve ter no máximo 3 dígitos.'
         validates_length_of :codigo_transmissao, maximum: 20, message: 'deve ter no máximo 20 dígitos.'
 
         def initialize(campos = {})
-          campos = { aceite: 'A', carteira: '101', codigo_carteira: '5', identificador_complemento: 'I' }.merge!(campos)
+          campos = { aceite: 'A', carteira: '101', codigo_carteira: '5', identificador_complemento: 'I', primeira_instrucao: '00', segunda_instrucao: '00' }.merge!(campos)
           super(campos)
         end
 
@@ -65,22 +68,22 @@ module Brcobranca
         # @return [String]
         #
         def monta_header
-          # CAMPO                 TAMANHO    VALOR
-          # tipo do registro      [1]        0
-          # operacao              [1]        1
-          # literal remessa       [7]        REMESSA
-          # Código do serviço     [2]        01
-          # cod. servico          [15]       COBRANCA
-          # info. conta           [20]
-          # empresa mae           [30]
-          # cod. banco            [3]
-          # nome banco            [15]
-          # data geracao          [6]        formato DDMMAA
-          # Zeros.................[16]
-          # complemento registro  [274] Brancos
-          # Versao da remessa.....[3] Numero da versao da remessa opcional, se informada, sera controlada pelo sistema (opcional = 000)
-          # num. sequencial       [6]        000001
-          "01REMESSA01COBRANCA       #{info_conta}#{empresa_mae.format_size(30)}#{cod_banco}#{nome_banco}#{data_geracao}#{complemento_zeros}#{complemento}000000001"
+          header = ''                                                       # CAMPO                 TAMANHO    VALOR
+          header << '0'                                                     # tipo do registro      [1]        0
+          header << '1'                                                     # operacao              [1]        1
+          header << 'REMESSA'                                               # literal remessa       [7]        REMESSA
+          header << '01'                                                    # Código do serviço     [2]        01
+          header << 'COBRANCA'.ljust(15, ' ')                               # cod. servico          [15]       COBRANCA
+          header << info_conta                                              # info. conta           [20]
+          header << empresa_mae.format_size(30)                             # empresa mae           [30]
+          header << cod_banco                                               # cod. banco            [3]
+          header << nome_banco                                              # nome banco            [15]
+          header << data_geracao                                            # data geracao          [6]        formato DDMMAA
+          header << complemento_zeros                                       # Zeros.................[16]
+          header << complemento                                             # complemento registro  [274]      Brancos
+          header << '000'                                                   # Versao da remessa.....[3]        Numero da versao da remessa opcional, se informada, sera controlada pelo sistema (opcional = 000)
+          header << '000001'                                                # num. sequencial       [6]        000001
+          header
         end
 
         # Detalhe do arquivo
@@ -98,7 +101,7 @@ module Brcobranca
           detalhe = '1'                                                     # identificacao transacao               9[01]
           detalhe << Brcobranca::Util::Empresa.new(documento_cedente).tipo  # tipo de identificacao da empresa      9[02]
           detalhe << documento_cedente.to_s.rjust(14, '0')                  # cpf/cnpj da empresa                   9[14]
-          detalhe << codigo_transmissao.ljust(20, ' ')                      # Código de Transmissão                 9[20]
+          detalhe << info_conta                                             # Código de Transmissão                 9[20]
           detalhe << ''.rjust(25, ' ')                                      # identificacao do tit. na empresa      X[25]
           detalhe << pagamento.nosso_numero.to_s.rjust(8, '0')              # nosso numero                          9[08]
           detalhe << ''.rjust(6, '0')                                       # data limite para o segundo desconto   9[06]
@@ -147,7 +150,7 @@ module Brcobranca
           # 06 = DUPLICATA DE SERVIÇO
           # 07 = LETRA DE CAMBIO
           detalhe << pagamento.especie_titulo                               # Espécie de documento                  9[02]
-          detalhe << 'N'                                                    # aceite (A/N)                          X[01]
+          detalhe << aceite                                                 # aceite (A/N)                          X[01]
           detalhe << pagamento.data_emissao.strftime('%d%m%y')              # data de emissao                       9[06]
 
           # Instrução cobrança
@@ -158,8 +161,8 @@ module Brcobranca
           # 06 = PROTESTAR (VIDE POSIÇÃO392/393)
           # 07 = NÃO PROTESTAR
           # 08 = NÃO COBRAR JUROS DE MORA
-          detalhe << '00'                                                   # Instrução para o título               9[02]
-          detalhe << '00'                                                   # Número de dias válidos para instrução 9[02]
+          detalhe << primeira_instrucao.rjust(2, '0')                       # Instrução para o título               9[02]
+          detalhe << segunda_instrucao.rjust(2, '0')                        # Número de dias válidos para instrução 9[02]
           detalhe << pagamento.formata_valor_mora                           # valor mora ao dia                     9[13]
           detalhe << pagamento.formata_data_desconto                        # data limite para desconto             9[06]
           detalhe << pagamento.formata_valor_desconto                       # valor do desconto                     9[13]
