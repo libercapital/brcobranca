@@ -7,6 +7,7 @@ module Brcobranca
         # Código de Transmissão
         # Consultar seu gerente para pegar esse código. Geralmente está no e-mail enviado pelo banco.
         attr_accessor :codigo_transmissao
+        attr_accessor :convenio
 
         attr_accessor :codigo_carteira
 
@@ -18,14 +19,14 @@ module Brcobranca
 
         attr_accessor :primeira_instrucao
         attr_accessor :segunda_instrucao
+        attr_accessor :instrucao_cobranca
 
-        validates_presence_of :documento_cedente, :codigo_transmissao, :agencia, :conta_corrente, :digito_conta, message: 'não pode estar em branco.'
+        validates_presence_of :documento_cedente, :agencia, :conta_corrente, :digito_conta, message: 'não pode estar em branco.'
         validates_length_of :documento_cedente, minimum: 11, maximum: 14, message: 'deve ter entre 11 e 14 dígitos.'
         validates_length_of :carteira, maximum: 3, message: 'deve ter no máximo 3 dígitos.'
-        validates_length_of :codigo_transmissao, maximum: 20, message: 'deve ter no máximo 20 dígitos.'
 
         def initialize(campos = {})
-          campos = { aceite: 'A', carteira: '101', codigo_carteira: '5', identificador_complemento: 'I', primeira_instrucao: '00', segunda_instrucao: '00' }.merge!(campos)
+          campos = { aceite: 'A', carteira: '101', codigo_carteira: '5', identificador_complemento: 'I', primeira_instrucao: '00', segunda_instrucao: '00', instrucao_cobranca: '05' }.merge!(campos)
           super(campos)
         end
 
@@ -44,7 +45,14 @@ module Brcobranca
         def info_conta
           # CAMPO                     TAMANHO
           # codigo_transmissao        20
-          codigo_transmissao.rjust(20, ' ')
+          unless codigo_transmissao
+            codigo_transmissao = ''
+            codigo_transmissao << agencia.format_size(4, '0')
+            codigo_transmissao << convenio.format_size(8, '0')
+            codigo_transmissao << conta_corrente[0..-3].format_size(8, '0')
+          end
+
+          codigo_transmissao.format_size(20, '0')
         end
 
         # Complemento do header
@@ -184,7 +192,7 @@ module Brcobranca
           detalhe << complemento_remessa                                    # Complemento                           9[2]
           detalhe << ''.rjust(6, ' ')                                       # Brancos                               X[06]
           # Se identificacao_ocorrencia = 06
-          detalhe << '00'.rjust(2, ' ')                                     # Número de dias para protesto          9[02]
+          detalhe << instrucao_cobranca.rjust(2, ' ')                       # Número de dias para protesto          9[02]
           detalhe << ''.rjust(1, ' ')                                       # Brancos                               X[1]
           detalhe << sequencial.to_s.rjust(6, '0')                          # numero do registro no arquivo         9[06]
           detalhe

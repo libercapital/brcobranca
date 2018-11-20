@@ -10,11 +10,11 @@ module Brcobranca
     # se a string for menor, adiciona espacos a direita
     # se a string for maior, trunca para o num. de caracteres
     #
-    def format_size(size)
+    def format_size(size, fill = ' ')
       if self.size > size
         ActiveSupport::Inflector.transliterate(truncate(size, omission: ''))
       else
-        ActiveSupport::Inflector.transliterate(ljust(size, ' '))
+        ActiveSupport::Inflector.transliterate(ljust(size, fill))
       end
     end
   end
