@@ -8,6 +8,7 @@ module Brcobranca
         # Consultar seu gerente para pegar esse código. Geralmente está no e-mail enviado pelo banco.
         attr_accessor :codigo_transmissao
         attr_accessor :convenio
+        attr_accessor :digito_agencia
 
         attr_accessor :codigo_carteira
 
@@ -26,7 +27,7 @@ module Brcobranca
         validates_length_of :carteira, maximum: 3, message: 'deve ter no máximo 3 dígitos.'
 
         def initialize(campos = {})
-          campos = { aceite: 'A', carteira: '101', codigo_carteira: '5', identificador_complemento: 'I', primeira_instrucao: '00', segunda_instrucao: '00', instrucao_cobranca: '05' }.merge!(campos)
+          campos = { aceite: 'A', carteira: '101', digito_agencia: ' ', codigo_carteira: '5', identificador_complemento: 'I', primeira_instrucao: '00', segunda_instrucao: '00', instrucao_cobranca: '05' }.merge!(campos)
           super(campos)
         end
 
@@ -47,12 +48,18 @@ module Brcobranca
           # codigo_transmissao        20
           unless codigo_transmissao
             codigo_transmissao = ''
-            codigo_transmissao << agencia.format_size(4, '0')
-            codigo_transmissao << convenio.format_size(8, '0')
-            codigo_transmissao << conta_corrente[0..-3].format_size(8, '0')
+            codigo_transmissao << agencia.rjust(4, '0').format_size(4, '0')
+            codigo_transmissao << convenio.rjust(8, '0').format_size(8, '0')
+            codigo_transmissao << conta_corrente[0..-2].rjust(8, '0').format_size(8, '0')
           end
 
           codigo_transmissao.format_size(20, '0')
+        end
+
+        def info_agencia_cobradora
+          agencia_cobradora = ''
+          agencia_cobradora << agencia.rjust(4, '0').format_size(4, '0')
+          agencia_cobradora << digito_agencia.rjust(1, '0').format_size(1, '0')
         end
 
         # Complemento do header
@@ -111,7 +118,8 @@ module Brcobranca
           detalhe << documento_cedente.to_s.rjust(14, '0')                  # cpf/cnpj da empresa                   9[14]
           detalhe << info_conta                                             # Código de Transmissão                 9[20]
           detalhe << ''.rjust(25, ' ')                                      # identificacao do tit. na empresa      X[25]
-          detalhe << pagamento.nosso_numero.to_s.rjust(8, '0')              # nosso numero                          9[08]
+          detalhe << formatar_nosso_numero(pagamento.nosso_numero)          # nosso numero                          9[07]
+          detalhe << digito_nosso_numero(formatar_nosso_numero(pagamento.nosso_numero))       # nosso numero                          9[01]
           detalhe << ''.rjust(6, '0')                                       # data limite para o segundo desconto   9[06]
           detalhe << ' '                                                    # brancos                               X[01]
           detalhe << pagamento.codigo_multa                                 # Com multa = 4, Sem multa = 0          9[01]
@@ -148,7 +156,7 @@ module Brcobranca
           # Código da agência cobradora do Banco Santander,
           # opcional informar somente se carteira for igual a 5,
           # caso contrário, informar zeros.
-          detalhe << agencia.rjust(5, '0') # agencia cobradora..............       9[05]
+          detalhe << info_agencia_cobradora                                 # agencia cobradora.....................9[05]
 
           # Espécie de documento:
           # 01 = DUPLICATA
@@ -192,7 +200,7 @@ module Brcobranca
           detalhe << complemento_remessa                                    # Complemento                           9[2]
           detalhe << ''.rjust(6, ' ')                                       # Brancos                               X[06]
           # Se identificacao_ocorrencia = 06
-          detalhe << instrucao_cobranca.rjust(2, ' ')                       # Número de dias para protesto          9[02]
+          detalhe << instrucao_cobranca.ljust(2, '0')                       # Número de dias para protesto          9[02]
           detalhe << ''.rjust(1, ' ')                                       # Brancos                               X[1]
           detalhe << sequencial.to_s.rjust(6, '0')                          # numero do registro no arquivo         9[06]
           detalhe
@@ -226,6 +234,17 @@ module Brcobranca
           # ultimo digito da conta corrente
           # digito da conta corrente
           "#{conta_corrente[-1]}#{digito_conta}"
+        end
+
+        def digito_nosso_numero(nosso_numero)
+          nosso_numero.to_s.modulo11(
+            multiplicador: [2,3,4,5,6,7,8,9],
+            mapeamento: { 10 => '1', 11 => '0', 1 => '0' }
+          ) { |total| 11 - (total % 11) }.to_s
+        end
+
+        def formatar_nosso_numero(nosso_numero)
+          nosso_numero.to_s.rjust(7, '0').format_size(7)
         end
       end
     end

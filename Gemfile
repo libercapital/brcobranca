@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  gem 'byebug', platform: :mri
+  gem 'byebug', '10.0.2', platform: :mri
   gem 'pry'
   gem 'rubocop'
   gem 'rubocop-rspec'
