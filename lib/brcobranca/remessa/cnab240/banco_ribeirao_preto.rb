@@ -207,7 +207,7 @@ module Brcobranca
           segmento_p << '2'                                                                # Tipo de Documento                          [60....60] 01
           segmento_p << emissao_boleto                                                     # Identificação da Emissão do Bloqueto       [61....61] 01
           segmento_p << distribuicao_boleto                                                # Identificação da Distribuição              [62....62] 01
-          segmento_p << pagamento.numero_documento.to_s.ljust(15, ' ')                     # Número do Documento de Cobrança            [63....77] 15
+          segmento_p << pagamento.uso_da_empresa.to_s.ljust(15, ' ')                       # Número do Documento de Cobrança            [63....77] 15
           segmento_p << pagamento.data_vencimento.strftime('%d%m%Y')                       # Data de Vencimento do Título               [78....85] 08
           segmento_p << pagamento.formata_valor(15)                                        # Valor Nominal do Título                    [86...100] 13 | 2
           segmento_p << ''.rjust(5, '0')                                                   # Agência Encarregada da Cobrança            [101..105] 05
@@ -223,7 +223,7 @@ module Brcobranca
           segmento_p << ''.rjust(15, '0')                                                  # Valor/Percentual a ser Concedido           [151..165] 13
           segmento_p << ''.rjust(15, '0')                                                  # Valor do IOF a ser Recolhido               [166..180] 13
           segmento_p << pagamento.formata_valor_abatimento(15)                             # Valor do Abatimento                        [181..195] 13 | 2
-          segmento_p << pagamento.uso_da_empresa.to_s.ljust(25, ' ')                       # Identificação do Título na Empresa         [196..220] 25
+          segmento_p << pagamento.numero_documento.to_s.ljust(25, ' ')                     # Identificação do Título na Empresa         [196..220] 25
           segmento_p << '3'                                                                # Código para Protesto                       [221..221] 01 | '1' = Protestar Dias Corridos | '2' = Protestar Dias Úteis | '3' = Não Protestar
           segmento_p << '00'                                                               # Número de Dias para Protesto               [222..223] 02
           segmento_p << '2'                                                                # Código para Baixa/Devolução                [224..224] 01 | '1' = Baixar/Devolver | '2' =  Não Baixar/Não Devolver
