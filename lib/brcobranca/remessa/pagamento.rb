@@ -14,6 +14,8 @@ module Brcobranca
       attr_accessor :data_emissao
       # <b>REQUERIDO</b>: valor do boleto
       attr_accessor :valor
+      # <b>REQUERIDO</b>: valor recebido na liquidação
+      attr_accessor :valor_liquidacao
       # <b>REQUERIDO</b>: documento do sacado (cliente)
       attr_accessor :documento_sacado
       # <b>REQUERIDO</b>: nome do sacado (cliente)
@@ -184,6 +186,7 @@ module Brcobranca
       def initialize(campos = {})
         padrao = {
           data_emissao: Date.current,
+          valor_liquidacao: 0.0,
           valor_mora: 0.0,
           valor_desconto: 0.0,
           valor_segundo_desconto: 0.0,
@@ -204,7 +207,6 @@ module Brcobranca
           natureza_operacao: "02", # Operações adquiridas em negociação com pessoa integrante do SFN sem retenção substancial de risco e de benefícios ou de controle pelo interveniente ou cedente
           origem_recurso: "0199", # outros
           classe_risco_operacao: "AA", # Classificação de risco AA
-
         }
 
         campos = padrao.merge!(campos)
@@ -274,6 +276,17 @@ module Brcobranca
       #
       def formata_valor(tamanho = 13)
         format_value(valor, tamanho)
+      end
+
+      # Formata o campo valor
+      # referentes as casas decimais
+      # exe. R$199,90 => 0000000019990
+      #
+      # @param tamanho [Integer]
+      #   quantidade de caracteres a ser retornado
+      #
+      def formata_valor_liquidacao(tamanho = 13)
+        format_value(valor_liquidacao, tamanho)
       end
 
       # Formata o campo valor da mora
