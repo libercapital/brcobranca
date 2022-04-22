@@ -11,6 +11,7 @@ module Brcobranca
         attr_accessor :identificacao_ocorrencia
         attr_accessor :primeira_instrucao
         attr_accessor :segunda_instrucao
+        attr_accessor :header_vendor_bank_account
 
         validates_presence_of :tipo_registro,
                               :coobrigacao,
@@ -75,7 +76,19 @@ module Brcobranca
         end
 
         def complemento
-          "#{''.rjust(8, ' ')}MX#{sequencial_remessa}#{''.rjust(321, ' ')}"
+          "#{''.rjust(8, ' ')}MX#{sequencial_remessa}#{header_vendor_bank_account_segment}#{''.rjust(299, ' ')}"
+        end
+
+        def header_vendor_bank_account_segment
+          return ''.ljust(22, ' ') if header_vendor_bank_account.nil?
+
+          conta = header_vendor_bank_account
+
+          "#{conta[:banco].rjust(3, '0')}"\
+          "#{conta[:agencia].rjust(5, '0')}"\
+          "#{conta[:agencia_digito].rjust(1, '0')}"\
+          "#{conta[:conta].rjust(12, '0')}"\
+          "#{conta[:conta_digito].rjust(1, '0')}"
         end
 
         # Formata o endereco do sacado
