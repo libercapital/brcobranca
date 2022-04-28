@@ -84,11 +84,11 @@ module Brcobranca
 
           conta = header_vendor_bank_account
 
-          "#{conta[:banco].rjust(3, '0')}"\
-          "#{conta[:agencia].rjust(5, '0')}"\
-          "#{conta[:agencia_digito].rjust(1, '0')}"\
-          "#{conta[:conta].rjust(12, '0')}"\
-          "#{conta[:conta_digito].rjust(1, '0')}"
+          "#{conta[:banco].rjust(3, ' ')}"\
+          "#{conta[:agencia].rjust(5, ' ')}"\
+          "#{conta[:agencia_digito].rjust(1, ' ')}"\
+          "#{conta[:conta].rjust(12, ' ')}"\
+          "#{conta[:conta_digito].rjust(1, ' ')}"
         end
 
         # Formata o endereco do sacado
