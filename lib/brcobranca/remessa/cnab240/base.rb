@@ -305,7 +305,7 @@ module Brcobranca
 
           arquivo << monta_trailer_arquivo(contador, ((pagamentos.size * 2) + (contador * 2) + 2))
 
-          remittance = arquivo.join("\n").unicode_normalize(:nfkd).encode('ASCII', undef: :replace, replace: '?').upcase
+          remittance = arquivo.join("\n").unicode_normalize(:nfkd).encode('ASCII', invalid: :replace, undef: :replace)
           remittance << "\n"
           remittance.encode(remittance.encoding, universal_newline: true).encode(remittance.encoding, crlf_newline: true)
         end
