@@ -76,7 +76,7 @@ module Brcobranca
           end
           ret << monta_trailer(contador + 1)
 
-          remittance = ret.join("\r\n").unicode_normalize(:nfkd).encode('ASCII', invalid: :replace, undef: :replace)
+          remittance = ret.join("\r\n").unicode_normalize(:nfkd).encode('ASCII', invalid: :replace, undef: :replace, replace: '').upcase
           remittance << "\r\n"
 
           remittance.encode(remittance.encoding, universal_newline: true).encode(remittance.encoding, crlf_newline: true)
