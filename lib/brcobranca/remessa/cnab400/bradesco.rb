@@ -193,6 +193,7 @@ module Brcobranca
             detalhe << pagamento.mensagem.format_size(60)             # 2a mensagem - verificar                     X[60]       335 a 394
           end
           detalhe << sequencial.to_s.rjust(6, '0')                    # numero do registro do arquivo               9[06]       395 a 400
+          detalhe << pagamento.chave_nota.to_s.ljust(44, " ")         # Chave da Nota Eletrônica                    X(44)       401 a 444
           detalhe
         end
 
