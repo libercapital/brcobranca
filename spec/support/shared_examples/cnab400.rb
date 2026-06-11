@@ -73,6 +73,9 @@ shared_examples_for 'cnab400' do
     end
   end
   let(:objeto) { subject.class.new(params) }
+  let(:expected_detalhe_size) { 400 }
+  # tamanho total da remessa: header(400) + \r\n(2) + detalhe(expected_detalhe_size) + \r\n(2) + trailer(400) + \r\n(2)
+  let(:expected_remessa_size) { 400 + 2 + expected_detalhe_size + 2 + 400 + 2 }
 
   it 'header deve ter 400 posicoes' do
     expect(objeto.monta_header.size).to eq 400
@@ -82,8 +85,8 @@ shared_examples_for 'cnab400' do
     expect { objeto.monta_detalhe(Brcobranca::Remessa::Pagamento.new, 1) }.to raise_error(Brcobranca::RemessaInvalida)
   end
 
-  it 'detalhe deve ter 400 posicoes' do
-    expect(objeto.monta_detalhe(pagamento, 1).size).to eq 400
+  it 'detalhe deve ter o numero correto de posicoes' do
+    expect(objeto.monta_detalhe(pagamento, 1).size).to eq expected_detalhe_size
   end
 
   context 'trailer' do
@@ -104,21 +107,25 @@ shared_examples_for 'cnab400' do
 
   it 'remessa deve conter os registros mais as quebras de linha' do
     remessa = objeto.gera_arquivo
-    expect(remessa.size).to eq 1206
+    expect(remessa.size).to eq expected_remessa_size
+
+    detalhe_end = 400 + 2 + expected_detalhe_size - 1
+    trailer_start = detalhe_end + 3
+    trailer_end = trailer_start + 399
 
     # registros
     expect(remessa[0..399]).to eq objeto.monta_header
-    expect(remessa[402..801]).to eq objeto.monta_detalhe(pagamento, 2).upcase
-    expect(remessa[804..1203]).to eq objeto.monta_trailer(3)
+    expect(remessa[402..detalhe_end]).to eq objeto.monta_detalhe(pagamento, 2).upcase
+    expect(remessa[trailer_start..trailer_end]).to eq objeto.monta_trailer(3)
     # quebras de linha
     expect(remessa[400..401]).to eq "\r\n"
-    expect(remessa[802..803]).to eq "\r\n"
+    expect(remessa[(detalhe_end + 1)..(detalhe_end + 2)]).to eq "\r\n"
   end
 
   it 'deve ser possivel adicionar mais de um pagamento' do
     objeto.pagamentos << pagamento
     remessa = objeto.gera_arquivo
 
-    expect(remessa.size).to eq 1608
+    expect(remessa.size).to eq expected_remessa_size + expected_detalhe_size + 2
   end
 end

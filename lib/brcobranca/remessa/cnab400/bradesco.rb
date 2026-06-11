@@ -149,11 +149,11 @@ module Brcobranca
           detalhe << ''.rjust(7, '0')                                 # conta corrente (op)                         9[07]       013 a 019
           detalhe << ''.rjust(1, '0')                                 # digito da conta corrente (op)               X[01]       020 a 020
           detalhe << identificacao_empresa                            # identficacao da empresa                     X[17]       021 a 037
-          detalhe << pagamento.uso_da_empresa.to_s.rjust(25, ' ')           # identificacao do tit. na empresa      X[25]       038 a 062
+          detalhe << pagamento.uso_da_empresa.to_s.rjust(25, ' ').format_size(25)  # identificacao do tit. na empresa      X[25]       038 a 062
           detalhe << ''.rjust(3, '0')                                 # codigo do banco (debito automatico apenas)  9[03]       063 a 065
           detalhe << campo_multa.rjust(1, '0')                        # campo da multa                              9[01]       066 a 066 *
-          detalhe << pagamento.percentual_multa.rjust(4, '0')         # percentual multa  00,00                     9[04]       067 a 070 *
-          detalhe << pagamento.nosso_numero.to_s.rjust(11, '0')       # identificacao do titulo (nosso numero)      9[11]       071 a 081
+          detalhe << pagamento.percentual_multa.to_s.tr('.', '').rjust(4, '0').format_size(4)  # percentual multa  00,00   9[04]       067 a 070 *
+          detalhe << pagamento.nosso_numero.to_s.rjust(11, '0').format_size(11)    # identificacao do titulo (nosso numero)      9[11]       071 a 081
           detalhe << digito_nosso_numero(pagamento.nosso_numero).to_s # digito de conferencia do nosso numero (dv)  X[01]       082 a 082
           detalhe << ''.rjust(10, '0')                                # desconto por dia                            9[10]       083 a 092
           detalhe << condicao_emissao                                 # condicao emissao boleto (1 Banco |2 cliente)9[01]       093 a 093
@@ -163,7 +163,7 @@ module Brcobranca
           detalhe << aviso_debito                                     # endereco para aviso debito (op 2 = ignora)  9[01]       106 a 106
           detalhe << ''.rjust(2, ' ')                                 # brancos                                     X[02]       107 a 108
           detalhe << pagamento.identificacao_ocorrencia               # identificacao ocorrencia                    9[02]       109 a 110
-          detalhe << pagamento.numero_documento.to_s.rjust(10, ' ')   # numero do documento alfanum.                X[10]       111 a 120
+          detalhe << pagamento.numero_documento.to_s.rjust(10, ' ').format_size(10)  # numero do documento alfanum. X[10]       111 a 120
           detalhe << pagamento.data_vencimento.strftime('%d%m%y')     # data de vencimento                          9[06]       121 a 126
           detalhe << pagamento.formata_valor                          # valor do titulo                             9[13]       127 a 139
           detalhe << ''.rjust(3, '0')                                 # banco encarregado (zeros)                   9[03]       140 a 142
@@ -179,7 +179,7 @@ module Brcobranca
           detalhe << pagamento.formata_valor_iof                      # valor iof                                   9[13]       193 a 205
           detalhe << pagamento.formata_valor_abatimento               # valor abatimento                            9[13]       206 a 218
           detalhe << pagamento.identificacao_sacado                   # identificacao do pagador                    9[02]       219 a 220
-          detalhe << pagamento.documento_sacado.to_s.rjust(14, '0')   # cpf/cnpj do pagador                         9[14]       221 a 234
+          detalhe << pagamento.documento_sacado.to_s.rjust(14, '0').format_size(14)  # cpf/cnpj do pagador          9[14]       221 a 234
           detalhe << pagamento.nome_sacado.format_size(40)            # nome do pagador                             9[40]       235 a 274
           detalhe << formata_endereco_sacado(pagamento)               # endereco do pagador                         X[40]       275 a 314
           detalhe << ''.rjust(12, ' ')                                # 1a mensagem                                 X[12]       315 a 326
@@ -190,10 +190,10 @@ module Brcobranca
             detalhe << ''.rjust(2, ' ')
             detalhe << pagamento.nome_avalista.format_size(43).ljust(43, '0')
           else
-            detalhe << pagamento.mensagem.format_size(60)             # 2a mensagem - verificar                     X[60]       335 a 394
+            detalhe << pagamento.mensagem.to_s.format_size(60)         # 2a mensagem - verificar                     X[60]       335 a 394
           end
           detalhe << sequencial.to_s.rjust(6, '0')                    # numero do registro do arquivo               9[06]       395 a 400
-          detalhe << pagamento.chave_nota.to_s.ljust(44, " ")         # Chave da Nota Eletrônica                    X(44)       401 a 444
+          detalhe << pagamento.chave_nota.to_s.ljust(44, " ").format_size(44)  # Chave da Nota Eletrônica             X(44)       401 a 444
           detalhe
         end
 
