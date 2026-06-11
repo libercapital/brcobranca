@@ -161,7 +161,35 @@ RSpec.describe Brcobranca::Remessa::Cnab400::Bradesco do
   end
 
   context 'monta remessa' do
-    it_behaves_like 'cnab400'
+    it_behaves_like 'cnab400' do
+      let(:expected_detalhe_size) { 444 }
+    end
+
+    context 'detalhe com campos longos' do
+      it 'deve ter exatamente 444 posicoes com numero_documento acima do limite' do
+        pgt = Brcobranca::Remessa::Pagamento.new(
+          valor: 199.9, data_vencimento: Date.current, nosso_numero: 123,
+          documento_sacado: '12345678901', nome_sacado: 'PABLO DIEGO JOSE',
+          endereco_sacado: 'RUA RIO GRANDE', cep_sacado: '12345678',
+          cidade_sacado: 'SAO PAULO', uf_sacado: 'SP',
+          identificacao_ocorrencia: '01', especie_titulo: '01', mensagem: 'MSG',
+          numero_documento: 'NUMERO_DOCUMENTO_LONGO_ACIMA_DE_DEZ'
+        )
+        expect(bradesco.monta_detalhe(pgt, 1).size).to eq 444
+      end
+
+      it 'deve ter exatamente 444 posicoes com chave_nota acima do limite' do
+        pgt = Brcobranca::Remessa::Pagamento.new(
+          valor: 199.9, data_vencimento: Date.current, nosso_numero: 123,
+          documento_sacado: '12345678901', nome_sacado: 'PABLO DIEGO JOSE',
+          endereco_sacado: 'RUA RIO GRANDE', cep_sacado: '12345678',
+          cidade_sacado: 'SAO PAULO', uf_sacado: 'SP',
+          identificacao_ocorrencia: '01', especie_titulo: '01', mensagem: 'MSG',
+          chave_nota: 'CHAVE_NFE_MUITO_LONGA_QUE_ULTRAPASSA_OS_QUARENTA_E_QUATRO_CARACTERES_PERMITIDOS'
+        )
+        expect(bradesco.monta_detalhe(pgt, 1).size).to eq 444
+      end
+    end
 
     context 'header' do
       it 'informacoes devem estar posicionadas corretamente no header' do
